@@ -26,7 +26,12 @@ class VarForm(FlaskForm):
     variables = FieldList(FormField(InfoForm))
     color_method = SelectField(u'Color Method:',
                                choices=[('Count', 'Count'), ('Percentile', 'Percentile'),
-                                        ('none', 'none')], default='Percentile')
+                                        ('None', 'None')], default='Percentile')
     red_bin = StringField(u'Red Bin:', default='33')
     yellow_bin = StringField(u'Yellow Bin:', default='33')
 
+
+class DataVisForm(FlaskForm):
+
+    variable = SelectField(u'Column Name:',
+                           choices=list())

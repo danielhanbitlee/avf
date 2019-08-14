@@ -43,7 +43,7 @@ def color_by_unique_vals(series: pd.Series, col_idx: int):
         """.replace("\n", ""))
 
 
-def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin: int, yellow_bin: int):
+def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin: float, yellow_bin: float):
     if method == "Percentile":
         red_pct = round(series.quantile(q=red_bin / 100), 6)
         yellow_pct = round(series.quantile(q=(red_bin + yellow_bin) / 100), 6)
@@ -95,6 +95,8 @@ def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin:
                 $(nRow).find('td:eq({col_idx})').css('background-color', '#0eff00');
                 }}
                 """.replace("\n", ""))
+    if method == "None":
+        return ""
 
 
 def color_data_fn(series: pd.Series, col_idx):
@@ -108,7 +110,6 @@ def color_data_fn(series: pd.Series, col_idx):
     colors = ['#F0FFF0', '#FFE4E1', '#F0E68C', '#ADFF2F', '#7FFF00', '#C0C0C0', '#EEE8AA', '#B0C4DE', '#00FF00', '#228B22', '#FFFF00', '#90EE90', '#483D8B', '#6495ED', '#3CB371', '#FFB6C1', '#EE82EE', '#008B8B', '#00FFFF', '#0000CD', '#4169E1', '#800080', '#40E0D0', '#800000', '#000080', '#FAFAD2', '#778899', '#FFF8DC', '#FF7F50', '#DAA520']
     # get distinct values
     unique_values = series.unique()
-    print(len(unique_values)) 
     color_js = ""
     for i, unique in enumerate(unique_values):
         color_js += f"""
