@@ -9,7 +9,7 @@
     <script>
         $(document).ready(function() {
             $('#data').DataTable( {
-                "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+                "rowCallback": function( nRow, aData, index) {
                    {{ color_data }}
                 }
           });
@@ -32,26 +32,12 @@ td.running {
 }
     </style>
 </head>
+<h1 style='font-family:helvetical;'>Raw Data Table</h1>
 <body>
 
         {{data | safe}}
 
-<p>
-{% if parameter_dict %}
-    <ul>
-  {% for key, var in parameter_dict.items() %}
-            {% if key == "error_messages" %}
-              {% for error_message in var %}
-                <li style="color:red;">{{ error_message }}</li>
-              {% endfor %}
-            {% else %}
-                <li>{{ key }} {{ var }}</li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-{% endif %}
-</p>
-
+<h1 style='font-family:helvetical;'>Attribute Value Frequency Configurations</h1>
 <form  method="POST", action="">
     {{ form.hidden_tag() }}
     <table>
@@ -60,13 +46,15 @@ td.running {
         <td align="center" style="font-weight:bold"> Variable Type </td>
         <td align="center" style="font-weight:bold"> Bin Method </td>
         <td align="center" style="font-weight:bold"> Number of Bins </td>
+        <td align="center" style="font-weight:bold"> Include Variable </td>
     </tr>
     {% for entry in form.variables %}
     <tr>
         <td align="right">{{ variables[loop.index0] | capitalize }}</td>
-        <td align="center">{{ entry.var_type }}</td>
+        <td align="center">{{ parameter_dict['var_type'][loop.index0] }}</td>
         <td align="center">{{ entry.bin_method }}</td>
         <td align="center">{{ entry.bin_number }}</td>
+        <td align="center">{{ entry.include_var }}</td>
     </tr>
     {% endfor %}
     </table>
@@ -88,6 +76,7 @@ td.running {
     <input type="submit" value="Submit">
         </form>
         <br>
+<h1 style='font-family:helvetical;'>Attribute Value Frequency Table</h1>
         {{avf_data | safe}}
 <script>
         {{ js_selector_script }}

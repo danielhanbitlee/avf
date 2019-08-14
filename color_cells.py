@@ -43,7 +43,7 @@ def color_by_unique_vals(series: pd.Series, col_idx: int):
         """.replace("\n", ""))
 
 
-def color_avf(series: pd.Series, method: str, col_idx: int, red_bin: int, yellow_bin: int):
+def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin: int, yellow_bin: int):
     if method == "Percentile":
         red_pct = round(series.quantile(q=red_bin / 100), 6)
         yellow_pct = round(series.quantile(q=(red_bin + yellow_bin) / 100), 6)
@@ -78,6 +78,23 @@ def color_avf(series: pd.Series, method: str, col_idx: int, red_bin: int, yellow
                 $(nRow).find('td:eq({col_idx})').css('background-color', 'red');
                 }}
                 """.replace("\n", ""))
+    if method == "Continuous":
+        red_pct = round(series.quantile(q=red_bin / 100), 6)
+        yellow_pct = round(series.quantile(q=(red_bin + yellow_bin) / 100), 6)
+        return Markup(f"""
+                if (aData[{col_idx + 1}] > {yellow_pct})
+                {{
+                $(nRow).find('td:eq({col_idx})').css('background-color', '#089000');
+                }}
+                if ((aData[{col_idx + 1}] > {red_pct}) && (aData[{col_idx + 1}] <= {yellow_pct}))
+                {{
+                $(nRow).find('td:eq({col_idx})').css('background-color', '#1fc600');
+                }}
+                if (aData[{col_idx + 1}] <= {red_pct})
+                {{
+                $(nRow).find('td:eq({col_idx})').css('background-color', '#0eff00');
+                }}
+                """.replace("\n", ""))
 
 
 def color_data_fn(series: pd.Series, col_idx):
@@ -87,14 +104,18 @@ def color_data_fn(series: pd.Series, col_idx):
     :param col_idx:
     :return:
     """
+    # distinct colors
+    colors = ['#F0FFF0', '#FFE4E1', '#F0E68C', '#ADFF2F', '#7FFF00', '#C0C0C0', '#EEE8AA', '#B0C4DE', '#00FF00', '#228B22', '#FFFF00', '#90EE90', '#483D8B', '#6495ED', '#3CB371', '#FFB6C1', '#EE82EE', '#008B8B', '#00FFFF', '#0000CD', '#4169E1', '#800080', '#40E0D0', '#800000', '#000080', '#FAFAD2', '#778899', '#FFF8DC', '#FF7F50', '#DAA520']
     # get distinct values
-    unique_values = sorted(series.unique())
+    unique_values = series.unique()
+    print(len(unique_values)) 
     color_js = ""
-    for unique in unique_values:
+    for i, unique in enumerate(unique_values):
         color_js += f"""
-                    if (aData[{col_idx + 1}] == '{unique}')
+		    var cellValue = aData[{col_idx + 1}].split('&gt;').join('>').split('&lt;').join('<')
+                    if (cellValue == '{unique}')
                     {{
-                    $(nRow).find('td:eq({col_idx})').css('background-color', 'green');
+                    $(nRow).find('td:eq({col_idx})').css('background-color', '{colors[i]}');
                     }}
                     """
     return Markup(color_js)

@@ -11,28 +11,14 @@ class InfoForm(Form):
     This general class gets a lot of form about puppies.
     Mainly a way to go through many of the WTForms Fields.
     '''
-    var_type = SelectField(u'Variable Type:',
-                           choices=[('numeric', 'numeric'), ('categorical', 'categorical'),
-                                    ('none', 'none')], default='categorical')
+    # var_type = SelectField(u'Variable Type:',
+    #                        choices=[('numeric', 'numeric'), ('categorical', 'categorical'),
+    #                                 ('none', 'none')], default='categorical')
     bin_method = SelectField(u'Bin Method:', choices=list())
-    bin_number = SelectField(u'Number of Bins:', choices=list())
-    # bin_method = SelectField(u'Bin Method:',
-    #                          choices=[('Equal Width Discretization', 'Equal Width Discretization'),
-    #                                   ('Equal Frequency Discretization', 'Equal Frequency Discretization')],
-    #                          default='Equal Width Discretization')
-    # bin_number = SelectField(u'Number of Bins:',
-    #                          choices=[('m', 'm'),
-    #                                   ('1', '1'),
-    #                                   ('2', '2'),
-    #                                   ('3', '3'),
-    #                                   ('4', '4'),
-    #                                   ('5', '5'),
-    #                                   ('6', '6'),
-    #                                   ('7', '7'),
-    #                                   ('8', '8'),
-    #                                   ('9', '9'),
-    #                                   ('10', '10')],
-    #                          default='10')
+    bin_number = SelectField(u'Number of Bins:', choices=list(), default=10)
+    include_var = SelectField(u'Include Variable?',
+                              choices=[('yes', 'yes'), ('no', 'no')],
+                              default="yes")
 
 
 class VarForm(FlaskForm):
