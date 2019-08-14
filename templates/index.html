@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#data').DataTable( {
+                "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+                   {{ color_data }}
+                }
+          });
+        });
+
+        $(document).ready(function() {
+            $('#avf_data').DataTable( {
+                "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+                   {{ color_avf_data }}
+                }
+          });
+        });
+    </script>
+    <style>
+    td.failed {
+  background-color: red;
+}
+td.running {
+  background-color: green;
+}
+    </style>
+</head>
+<body>
+
+        {{data | safe}}
+
+<p>
+{% if parameter_dict %}
+    <ul>
+  {% for key, var in parameter_dict.items() %}
+            {% if key == "error_messages" %}
+              {% for error_message in var %}
+                <li style="color:red;">{{ error_message }}</li>
+              {% endfor %}
+            {% else %}
+                <li>{{ key }} {{ var }}</li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+{% endif %}
+</p>
+
+<form  method="POST", action="">
+    {{ form.hidden_tag() }}
+    <table>
+    <tr>
+        <td align="center" style="font-weight:bold"> Variable Name </td>
+        <td align="center" style="font-weight:bold"> Variable Type </td>
+        <td align="center" style="font-weight:bold"> Bin Method </td>
+        <td align="center" style="font-weight:bold"> Number of Bins </td>
+    </tr>
+    {% for entry in form.variables %}
+    <tr>
+        <td align="right">{{ variables[loop.index0] | capitalize }}</td>
+        <td align="center">{{ entry.var_type }}</td>
+        <td align="center">{{ entry.bin_method }}</td>
+        <td align="center">{{ entry.bin_number }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+    <br>
+     <table>
+        <tr>
+            <td align="right" style="font-weight:bold">AVF Color Method </td>
+            <td align="left">{{ form.color_method }}</td>
+        </tr>
+        <tr>
+            <td align="right" style="font-weight:bold"> Red Bin </td>
+            <td align="left">{{ form.red_bin }}</td>
+        </tr>
+        <tr>
+            <td align="right" style="font-weight:bold"> Yellow Bin </td>
+            <td align="left">{{ form.yellow_bin }}</td>
+        </tr>
+    </table>
+    <input type="submit" value="Submit">
+        </form>
+        <br>
+        {{avf_data | safe}}
+<script>
+        {{ js_selector_script }}
+    </script>
+</body>
+</html>
