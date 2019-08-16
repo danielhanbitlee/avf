@@ -4,7 +4,10 @@ from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import DoubleType
 from pyspark.sql.functions import count, udf, array
 from pyspark.sql.window import Window
+import numpy as np
 import pandas as pd
+
+from data_wrangling import convert_col_to_cat
 
 
 def calc_avf(data:DataFrame, cat_col: list):
@@ -41,8 +44,6 @@ def count_freq_for_cat(df):
         counts_dict[col] = df[col].value_counts().to_dict()
     return counts_dict
 
-# counts_dict = count_freq_for_cat(data_with_cat)
-
 
 def map_freq_to_value(df, counts_dict):
     df_with_freq = pd.DataFrame()
@@ -53,6 +54,14 @@ def map_freq_to_value(df, counts_dict):
             df_with_freq[col] = df[col]
     return df_with_freq
 
-# data_num_to_cat_with_freq = map_freq_to_value(data_with_cat, counts_dict)
 
-# data_num_to_cat_with_freq.head()
+def convert_data_to_avf(df):
+    # convert object columns to categorical dtypes
+    num_obj_data = convert_col_to_cat(df, df.columns)
+    # get counts for each category as dictionary 
+    counts_dict = count_freq_for_cat(num_obj_data)
+    # create df of frequencies: avf_data
+    avf_data = map_freq_to_value(num_obj_data, counts_dict)
+    # add avf column
+    avf_data['avf'] = avf_data.apply(np.sum, axis=1) / len(avf_data.columns)
+    return avf_data, counts_dict 

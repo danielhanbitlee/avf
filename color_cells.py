@@ -62,8 +62,8 @@ def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin:
                 }}
                 """.replace("\n", ""))
     elif method == "Count":
-        red = round(series.sort_values().values[red_bin - 1], 6)
-        yellow = round(series.sort_values().values[red_bin + yellow_bin - 1], 6)
+        red = round(series.sort_values().values[int(round(red_bin, 0)) - 1], 6)
+        yellow = round(series.sort_values().values[int(round(red_bin + yellow_bin, 0)) - 1], 6)
         return Markup(f"""
                 if (aData[{col_idx + 1}] > {yellow})
                 {{
@@ -120,3 +120,41 @@ def color_data_fn(series: pd.Series, col_idx):
                     }}
                     """
     return Markup(color_js)
+
+
+def color_avf_data_fn(avf_data, form=None, parameter_dict=None):
+    
+    color_avf_data = ""
+
+    # add function to color the cells
+    for col in avf_data:
+        if col != "avf":
+            avf_data[col].quantile(q=.33)
+            color_avf_data += color_by_unique_vals(avf_data[col], int(avf_data.columns.get_loc(col)))
+
+    if form:
+        color_method = form.color_method.data
+        red_bin = form.red_bin.data
+        yellow_bin = form.yellow_bin.data
+
+    else:
+        color_method = "Percentile"
+        red_bin = 33
+        yellow_bin = 33
+
+    try:
+        color_avf_data += color_by_count_or_pct(avf_data['avf'], method=color_method,
+                                                col_idx=int(avf_data.columns.get_loc('avf')),
+                                                red_bin=float(red_bin),
+                                                yellow_bin=float(yellow_bin))
+
+    except ValueError as e:
+        color_avf_data += color_by_count_or_pct(avf_data['avf'], method=color_method,
+    	                                        col_idx=int(avf_data.columns.get_loc('avf')),
+    	                                        red_bin=float(red_bin),
+    	                                        yellow_bin=float(yellow_bin))
+        if parameter_dict:	
+            parameter_dict['error_messages'].append("Percentiles should all be in the interval [0, 100].")
+
+    return color_avf_data, parameter_dict
+
