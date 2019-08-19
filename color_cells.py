@@ -43,7 +43,8 @@ def color_by_unique_vals(series: pd.Series, col_idx: int):
         """.replace("\n", ""))
 
 
-def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin: float, yellow_bin: float):
+def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin=None, yellow_bin=None):
+
     if method == "Percentile":
         red_pct = round(series.quantile(q=red_bin / 100), 6)
         yellow_pct = round(series.quantile(q=(red_bin + yellow_bin) / 100), 6)
@@ -61,6 +62,7 @@ def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin:
                 $(nRow).find('td:eq({col_idx})').css('background-color', 'red');
                 }}
                 """.replace("\n", ""))
+
     elif method == "Count":
         red = round(series.sort_values().values[int(round(red_bin, 0)) - 1], 6)
         yellow = round(series.sort_values().values[int(round(red_bin + yellow_bin, 0)) - 1], 6)
@@ -78,7 +80,8 @@ def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin:
                 $(nRow).find('td:eq({col_idx})').css('background-color', 'red');
                 }}
                 """.replace("\n", ""))
-    if method == "Continuous":
+
+    elif method == "Continuous":
         red_pct = round(series.quantile(q=red_bin / 100), 6)
         yellow_pct = round(series.quantile(q=(red_bin + yellow_bin) / 100), 6)
         return Markup(f"""
@@ -95,7 +98,30 @@ def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin:
                 $(nRow).find('td:eq({col_idx})').css('background-color', '#0eff00');
                 }}
                 """.replace("\n", ""))
-    if method == "None":
+
+    elif method == "NAVF":
+        mean = series.mean()
+        sd = series.std()
+        red = round(mean - 3 * sd, 6)
+        yellow = round(mean - 2 * sd, 6)
+
+        return Markup(f"""
+                if (aData[{col_idx + 1}] > {yellow})
+                {{
+                $(nRow).find('td:eq({col_idx})').css('background-color', 'green');
+                }}
+                if ((aData[{col_idx + 1}] > {red}) && (aData[{col_idx + 1}] <= {yellow}))
+                {{
+                $(nRow).find('td:eq({col_idx})').css('background-color', 'yellow');
+                }}
+                if (aData[{col_idx + 1}] <= {red})
+                {{
+                $(nRow).find('td:eq({col_idx})').css('background-color', 'red');
+                }}
+                """.replace("\n", ""))
+
+    # if method == "None":
+    else:
         return ""
 
 
@@ -143,10 +169,16 @@ def color_avf_data_fn(avf_data, form=None, parameter_dict=None):
         yellow_bin = 33
 
     try:
-        color_avf_data += color_by_count_or_pct(avf_data['avf'], method=color_method,
-                                                col_idx=int(avf_data.columns.get_loc('avf')),
-                                                red_bin=float(red_bin),
-                                                yellow_bin=float(yellow_bin))
+        if color_method == "NAVF":
+            color_avf_data += color_by_count_or_pct(avf_data['avf'], method=color_method,
+                                                    col_idx=int(avf_data.columns.get_loc('avf')))
+                                                    
+        else:
+             color_avf_data += color_by_count_or_pct(avf_data['avf'], method=color_method,
+                                                    col_idx=int(avf_data.columns.get_loc('avf')),
+                                                    red_bin=float(red_bin),
+                                                    yellow_bin=float(yellow_bin))
+   
 
     except ValueError as e:
         color_avf_data += color_by_count_or_pct(avf_data['avf'], method=color_method,

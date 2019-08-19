@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from sklearn.preprocessing import StandardScaler
+
 from flask import Flask, render_template, request
 from wtforms import SelectField, FormField, FieldList
 
@@ -76,7 +78,7 @@ def index():
 
 
     # convert raw data to avf 
-    avf_data, counts_dict = convert_data_to_avf(data_copy)    
+    avf_data, counts_dict = convert_data_to_avf(data_copy, True)    
 
     dataVisForm = DataVisForm()
 
@@ -116,21 +118,33 @@ def index():
                 parameter_dict['var_type'].append('categorical')
 
         # convert raw data to avf 
-        avf_data, counts_dict = convert_data_to_avf(data_copy)    
+        avf_data, counts_dict = convert_data_to_avf(data_copy, False)    
+
+        # standardize 
+        for i, col in enumerate(avf_data.columns):
+            if form.variables[i].data['standardize'] == 'yes':
+                scaler = StandardScaler()
+                avf_data[col] = scaler.fit_transform(avf_data[[col]])
+
+        avf_data['avf'] = avf_data.apply(np.sum, axis=1) / len(avf_data.columns)
 
         script, div = dataVis(dataVisForm, avf_data, counts_dict)
 
         color_avf_data, parameter_dict = color_avf_data_fn(avf_data, form, parameter_dict)
 
-        return render_template('index.html',
-                               data=pd_data.to_html(table_id="data"),
-                               avf_data=avf_data.to_html(table_id='avf_data'),
-                               variables=pd_data.columns,
-                               form=form, parameter_dict=parameter_dict,
-                               color_avf_data=color_avf_data,
-                               color_data=color_data, 
-                               script=script, 
-                               div=div, avf_col_names=avf_data.columns, dataVisForm=dataVisForm)
+        if form.color_method.data == "NAVF":
+            form.red_bin.data = None
+            form.yellow_bin.data = None 
+
+    return render_template('index.html',
+                           data=pd_data.to_html(table_id="data"),
+                           avf_data=avf_data.to_html(table_id='avf_data'),
+                           variables=pd_data.columns,
+                           form=form, parameter_dict=parameter_dict,
+                           color_avf_data=color_avf_data,
+                           color_data=color_data, 
+                           script=script, 
+                           div=div, avf_col_names=avf_data.columns, dataVisForm=dataVisForm)
 
 
 if __name__ == '__main__':

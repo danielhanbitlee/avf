@@ -55,13 +55,15 @@ def map_freq_to_value(df, counts_dict):
     return df_with_freq
 
 
-def convert_data_to_avf(df):
+def convert_data_to_avf(df, add_avf_col: bool):
     # convert object columns to categorical dtypes
     num_obj_data = convert_col_to_cat(df, df.columns)
     # get counts for each category as dictionary 
     counts_dict = count_freq_for_cat(num_obj_data)
     # create df of frequencies: avf_data
     avf_data = map_freq_to_value(num_obj_data, counts_dict)
-    # add avf column
-    avf_data['avf'] = avf_data.apply(np.sum, axis=1) / len(avf_data.columns)
+    if add_avf_col:
+        # add avf column
+        avf_data['avf'] = avf_data.apply(np.sum, axis=1) / len(avf_data.columns)
     return avf_data, counts_dict 
+

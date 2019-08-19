@@ -63,7 +63,8 @@ td.running {
         <td align="center" style="font-weight:bold"> Variable Type </td>
         <td align="center" style="font-weight:bold"> Bin Method </td>
         <td align="center" style="font-weight:bold"> Number of Bins </td>
-        <td align="center" style="font-weight:bold"> Include Variable </td>
+	<td align="center" style="font-weight:bold"> Include Variable </td>
+	<td align="center" style="font-weight:bold"> Standardize </td>
     </tr>
     {% for entry in form.variables %}
     <tr>
@@ -72,6 +73,7 @@ td.running {
         <td align="center">{{ entry.bin_method }}</td>
         <td align="center">{{ entry.bin_number }}</td>
         <td align="center">{{ entry.include_var }}</td>
+        <td align="center">{{ entry.standardize}}</td>
     </tr>
     {% endfor %}
     </table>
