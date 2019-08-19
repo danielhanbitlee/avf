@@ -64,7 +64,7 @@ def index():
                                                      'Equal Frequency Discretization')]
             max_bins = len(data_copy[col].unique())
 
-            form.variables[i].bin_number.choices = [(i, i) for i in range(1, max_bins)]
+            form.variables[i].bin_number.choices = [(i, i) for i in range(1, min(max_bins, 21))]
 
             parameter_dict['bin_method'].append('Equal Width Discretization')
             parameter_dict['bin_number'].append(10)
@@ -109,7 +109,7 @@ def index():
                                                          'Equal Frequency Discretization')]
                 max_bins = len(data_copy[col].unique())
 
-                form.variables[i].bin_number.choices = [(i, i) for i in range(1, max_bins)]
+                form.variables[i].bin_number.choices = [(i, i) for i in range(1, min(max_bins, 21))]
 
                 data_copy[col] = convert_num_to_obj_columnwise(series=data_copy[col],
                                                                discretization=parameter_dict['bin_method'][i],
