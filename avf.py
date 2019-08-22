@@ -7,7 +7,7 @@ from pyspark.sql.window import Window
 import numpy as np
 import pandas as pd
 
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from data_wrangling import convert_col_to_cat
 
 
@@ -74,8 +74,11 @@ def convert_data_to_avf_columnwise(df: pd.DataFrame, form=None, var_idx_list=Non
        avf_data[col] = df[col].map(counts_dict[col]).astype('int64')
 
        if form:
-           if form.variables[var_idx_list[i]].data['standardize'] == 'yes':
-               scaler = StandardScaler()
+           if form.variables[var_idx_list[i]].data['scale'] != 'none':
+               if form.variables[var_idx_list[i]].data['scale'] != 'standardize':
+                   scaler = StandardScaler()
+               elif form.variables[var_idx_list[i]].data['scale'] != 'min-max scaler':
+                   scaler = MinMaxScaler()
 
                # scale the avf_data[col] column
                scaled_freq_ct = scaler.fit_transform(avf_data[[col]])

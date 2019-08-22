@@ -16,19 +16,23 @@ class InfoForm(Form):
     include_var = SelectField(u'Include Variable?',
                               choices=[('yes', 'yes'), ('no', 'no')],
                               default="yes")
-    standardize = SelectField(u'Standardize?',
-                              choices=[('yes', 'yes'), ('no', 'no')],
-                              default="no")
+    scale = SelectField(u'Scale',
+                              choices=[('standardize', 'standardize'),
+                                       ('min-max scaler', 'min-max scaler'),
+                                       ('none', 'none')],
+                              default="none")
     
 
 class VarForm(FlaskForm):
 
     variables = FieldList(FormField(InfoForm))
     color_method = SelectField(u'Color Method:',
-                               choices=[('Count', 'Count'), ('Percentile', 'Percentile'),
+                               choices=[('Count', 'Count'),
+                                        ('Percentile', 'Percentile'),
                                         ('NAVF', 'NAVF'),
                                         ('fuzzy AVF', 'fuzzy AVF'),
-                                        ('None', 'None')], default='Percentile')
+                                        ('None', 'None')],
+                               default='Percentile')
     red_bin = StringField(u'Red Bin:', default='33')
     yellow_bin = StringField(u'Yellow Bin:', default='33')
 
