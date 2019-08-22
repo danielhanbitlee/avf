@@ -13,7 +13,7 @@ from js_generator import dynamic_selector_script
 from infoform import InfoForm, VarForm, DataVisForm
 from dataVis import dataVis
 
-pd_data = pd.read_csv('../anomaly_detection-master/data/predict_income.csv').iloc[:1000, ]
+pd_data = pd.read_csv('data/predict_income.csv').iloc[:1000, ]
 pd_data.drop(columns=['id', 'fnlwgt'], inplace=True)
 
 # obtained from kaggle website
