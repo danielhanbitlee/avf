@@ -22,6 +22,7 @@ def dataVis(dataVisForm, avf_data, counts_dict):
         p.vbar(x=categories, top=counts, width=0.9)
         p.xgrid.grid_line_color = None
         p.xaxis.major_label_text_font_size = "12pt"
-        p.y_range.start = 0
+        # get min value
+        p.y_range.start = min(avf_data[current_avf_col_name].min() * 1.1, 0) 
     return components(p)
      

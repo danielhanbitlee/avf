@@ -7,6 +7,7 @@ from pyspark.sql.window import Window
 import numpy as np
 import pandas as pd
 
+from sklearn.preprocessing import StandardScaler
 from data_wrangling import convert_col_to_cat
 
 
@@ -17,15 +18,6 @@ def calc_avf(data:DataFrame, cat_col: list):
     :param cat_col: list of categorical columns
     :return Spark dataframe with avf column added
     """
-    # spark = SparkSession.builder.getOrCreate()
-    #
-    # if path.endswith('csv'):
-    #     # Read in the CSV
-    #     data = spark.read.option("inferSchema", "True").csv(path, header=True)
-    # else:
-    #     # Read in the Parquet
-    #     data = spark.read.parquet(*path)
-
     for column in cat_col:
         # get frequency for each column
         data = data.withColumn(column, count(column).over(Window.partitionBy(column)))
@@ -38,6 +30,7 @@ def calc_avf(data:DataFrame, cat_col: list):
     return data
 
 
+# below is converting all columns at once
 def count_freq_for_cat(df):
     counts_dict = dict()
     for col in df.select_dtypes(['category']):
@@ -66,4 +59,44 @@ def convert_data_to_avf(df, add_avf_col: bool):
         # add avf column
         avf_data['avf'] = avf_data.apply(np.sum, axis=1) / len(avf_data.columns)
     return avf_data, counts_dict 
+
+
+def convert_data_to_avf_columnwise(df: pd.DataFrame, form=None, var_idx_list=None):
+    # convert raw data to avf columnwise
+    counts_dict = dict()
+    avf_data = pd.DataFrame()
+
+    for i, col in enumerate(df):
+       # get dictionary of value counts for column
+       counts_dict[col] = df[col].value_counts().to_dict() 
+
+       # map dictionary of value counts and create a new column avf_data[col]
+       avf_data[col] = df[col].map(counts_dict[col]).astype('int64')
+
+       if form:
+           if form.variables[var_idx_list[i]].data['standardize'] == 'yes':
+               scaler = StandardScaler()
+
+               # scale the avf_data[col] column
+               scaled_freq_ct = scaler.fit_transform(avf_data[[col]])
+               scaled_dict = dict(zip(avf_data[col], scaled_freq_ct))
+
+               avf_data[col] = scaled_freq_ct
+
+               categories_to_delete = list()
+
+               for category_name, freq_ct in counts_dict[col].items():
+
+                   try:
+                       scaled_freq_ct = scaled_dict[freq_ct]
+                       counts_dict[col][category_name] = scaled_freq_ct
+
+                   except KeyError:
+                       categories_to_delete.append(category_name)
+
+               if categories_to_delete:
+                   for cat in categories_to_delete:
+                       del counts_dict[col][cat]
+
+    return avf_data, counts_dict
 

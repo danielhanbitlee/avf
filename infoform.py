@@ -27,6 +27,7 @@ class VarForm(FlaskForm):
     color_method = SelectField(u'Color Method:',
                                choices=[('Count', 'Count'), ('Percentile', 'Percentile'),
                                         ('NAVF', 'NAVF'),
+                                        ('fuzzy AVF', 'fuzzy AVF'),
                                         ('None', 'None')], default='Percentile')
     red_bin = StringField(u'Red Bin:', default='33')
     yellow_bin = StringField(u'Yellow Bin:', default='33')

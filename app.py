@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from flask import Flask, render_template, request
 from wtforms import SelectField, FormField, FieldList
 
-from avf import calc_avf, count_freq_for_cat, map_freq_to_value, convert_data_to_avf
+from avf import calc_avf, count_freq_for_cat, map_freq_to_value, convert_data_to_avf, convert_data_to_avf_columnwise
 from data_wrangling import convert_num_to_obj, convert_col_to_cat, convert_num_to_obj_columnwise
 from color_cells import color_by_unique_vals, color_by_count_or_pct, color_data_fn, color_avf_data_fn
 from js_generator import dynamic_selector_script
@@ -89,6 +89,10 @@ def index():
     if request.method == 'POST':
         data_copy = pd_data.copy()
         parameter_dict = dict(var_type=list(), bin_method=list(), bin_number=list(), error_messages=list())
+
+        # list to keep track of positions for valid columns
+        var_idx_list = list()
+
         for i, data in enumerate(form.variables.data):
             parameter_dict['bin_method'].append(data['bin_method'])
             parameter_dict['bin_number'].append(data['bin_number'])
@@ -102,6 +106,7 @@ def index():
                 parameter_dict['bin_number'].append(data['bin_number'])
                 data_copy.drop(columns=col, inplace=True)
             elif col not in cat_col:
+                var_idx_list.append(i)
                 parameter_dict['var_type'].append('numeric')
                 form.variables[i].bin_method.choices = [('Equal Width Discretization',
                                                          'Equal Width Discretization'),
@@ -115,22 +120,23 @@ def index():
                                                                discretization=parameter_dict['bin_method'][i],
                                                                nbins=int(parameter_dict['bin_number'][i]))
             else:
+                var_idx_list.append(i)
                 parameter_dict['var_type'].append('categorical')
 
-        # convert raw data to avf 
-        avf_data, counts_dict = convert_data_to_avf(data_copy, False)    
-
-        # standardize 
-        for i, col in enumerate(avf_data.columns):
-            if form.variables[i].data['standardize'] == 'yes':
-                scaler = StandardScaler()
-                avf_data[col] = scaler.fit_transform(avf_data[[col]])
+        avf_data, counts_dict = convert_data_to_avf_columnwise(data_copy, form, var_idx_list)
 
         avf_data['avf'] = avf_data.apply(np.sum, axis=1) / len(avf_data.columns)
 
         script, div = dataVis(dataVisForm, avf_data, counts_dict)
 
-        color_avf_data, parameter_dict = color_avf_data_fn(avf_data, form, parameter_dict)
+        try:
+            color_avf_data, parameter_dict = color_avf_data_fn(avf_data, form, parameter_dict)
+
+        # no values were passed into the "red bin" and "yellow bin" fields to color avf values
+        except ValueError as e: 
+           parameter_dict['error_messages'].append('Must enter numbers for "red bin" and "yellow bin" fields') 
+           form.color_method.data = "NAVF"
+           color_avf_data, parameter_dict = color_avf_data_fn(avf_data, form, parameter_dict)
 
         if form.color_method.data == "NAVF":
             form.red_bin.data = None

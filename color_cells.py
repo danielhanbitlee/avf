@@ -1,6 +1,7 @@
 from flask import Markup
 import pandas as pd
 
+from fuzzyAVF import fuzzy_smf, get_fuzzy_bins 
 
 def color_by_unique_vals(series: pd.Series, col_idx: int):
     # get distinct values
@@ -8,18 +9,18 @@ def color_by_unique_vals(series: pd.Series, col_idx: int):
     nunique = len(unique)
     if nunique == 1:
         return Markup(f"""
-        if (aData[{col_idx + 1}] == {unique[0]})
+        if (aData[{col_idx + 1}] == {round(unique[0], 6)})
         {{
         $(nRow).find('td:eq({col_idx})').css('background-color', 'green');
         }}
         """.replace("\n", ""))
     if nunique == 2:
         return Markup(f"""
-        if (aData[{col_idx + 1}] == {unique[0]})
+        if (aData[{col_idx + 1}] == {round(unique[0], 6)})
         {{
         $(nRow).find('td:eq({col_idx})').css('background-color', 'yellow');
         }}
-        if (aData[{col_idx + 1}] == {unique[1]})
+        if (aData[{col_idx + 1}] == {round(unique[1], 6)})
         {{
         $(nRow).find('td:eq({col_idx})').css('background-color', 'green');
         }}
@@ -44,7 +45,6 @@ def color_by_unique_vals(series: pd.Series, col_idx: int):
 
 
 def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin=None, yellow_bin=None):
-
     if method == "Percentile":
         red_pct = round(series.quantile(q=red_bin / 100), 6)
         yellow_pct = round(series.quantile(q=(red_bin + yellow_bin) / 100), 6)
@@ -120,7 +120,24 @@ def color_by_count_or_pct(series: pd.Series, method: str, col_idx: int, red_bin=
                 }}
                 """.replace("\n", ""))
 
-    # if method == "None":
+    elif method == "fuzzy AVF":
+        y = fuzzy_smf(series)
+        red, yellow = get_fuzzy_bins(series, y, red_bin, yellow_bin)
+        return Markup(f"""
+               if (aData[{col_idx + 1}] > {yellow})
+               {{
+               $(nRow).find('td:eq({col_idx})').css('background-color', 'green');
+               }}
+               if ((aData[{col_idx + 1}] > {red}) && (aData[{col_idx + 1}] <= {yellow}))
+               {{
+               $(nRow).find('td:eq({col_idx})').css('background-color', 'yellow');
+               }}
+               if (aData[{col_idx + 1}] <= {red})
+               {{
+               $(nRow).find('td:eq({col_idx})').css('background-color', 'red');
+               }}
+               """.replace("\n", ""))
+
     else:
         return ""
 
@@ -149,14 +166,17 @@ def color_data_fn(series: pd.Series, col_idx):
 
 
 def color_avf_data_fn(avf_data, form=None, parameter_dict=None):
-    
+    """
+    Generates javascript to color data table cells
+    """ 
     color_avf_data = ""
 
     # add function to color the cells
     for col in avf_data:
         if col != "avf":
             avf_data[col].quantile(q=.33)
-            color_avf_data += color_by_unique_vals(avf_data[col], int(avf_data.columns.get_loc(col)))
+            color_avf_data += color_by_unique_vals(avf_data[col],
+                                                   int(avf_data.columns.get_loc(col)))
 
     if form:
         color_method = form.color_method.data
@@ -167,9 +187,8 @@ def color_avf_data_fn(avf_data, form=None, parameter_dict=None):
         color_method = "Percentile"
         red_bin = 33
         yellow_bin = 33
-
     try:
-        if color_method == "NAVF":
+        if color_method in ["NAVF", "None"]:
             color_avf_data += color_by_count_or_pct(avf_data['avf'], method=color_method,
                                                     col_idx=int(avf_data.columns.get_loc('avf')))
                                                     

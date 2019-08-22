@@ -49,3 +49,4 @@ def convert_num_to_obj_columnwise(series: pd.Series, discretization: str, nbins:
             print(e)
             return series
     return pd.qcut(series, q=nbins, duplicates='drop')
+
