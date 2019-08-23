@@ -73,9 +73,17 @@ td.running {
         <td align="center">{{ entry.bin_method }}</td>
         <td align="center">{{ entry.bin_number }}</td>
         <td align="center">{{ entry.include_var }}</td>
-        <td align="center">{{ entry.scale}}</td>
+        <td align="center">{{ entry.normalize }}</td>
     </tr>
     {% endfor %}
+    <tr>
+        <td align="right"> All Variables </td>
+        <td align="center"></td>
+        <td align="center"></td>
+        <td align="center"></td>
+        <td align="center"></td>
+        <td align="center">{{ form.all_variables }}</td>
+
     </table>
     <br>
      <table>

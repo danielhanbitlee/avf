@@ -122,7 +122,19 @@ def index():
             else:
                 var_idx_list.append(i)
                 parameter_dict['var_type'].append('categorical')
-
+        print(form.all_variables.data == "not applicable")
+        print(form.all_variables)
+        print(type(form.all_variables.data))
+        # if form.all_variables != 'not applicable', then change all normalize values in variables accordingly
+        if form.all_variables.data != 'not applicable':
+            print(form.all_variables.data)
+            for i in range(len(data_copy.columns)):
+                form.variables[i].normalize.data = form.all_variables.data 
+        else:
+            print(form.all_variables.data)
+            print("here!!!")
+            for i in range(len(data_copy.columns)):
+                print(form.variables[i].normalize.data)
         avf_data, counts_dict = convert_data_to_avf_columnwise(data_copy, form, var_idx_list)
 
         avf_data['avf'] = avf_data.apply(np.sum, axis=1) / len(avf_data.columns)

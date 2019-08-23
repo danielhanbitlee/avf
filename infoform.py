@@ -8,7 +8,6 @@ from wtforms.validators import DataRequired
 
 class InfoForm(Form):
     '''
-    This general class gets a lot of form about puppies.
     Mainly a way to go through many of the WTForms Fields.
     '''
     bin_method = SelectField(u'Bin Method:', choices=list())
@@ -16,7 +15,7 @@ class InfoForm(Form):
     include_var = SelectField(u'Include Variable?',
                               choices=[('yes', 'yes'), ('no', 'no')],
                               default="yes")
-    scale = SelectField(u'Scale',
+    normalize = SelectField(u'Scale',
                               choices=[('standardize', 'standardize'),
                                        ('min-max scaler', 'min-max scaler'),
                                        ('none', 'none')],
@@ -35,6 +34,12 @@ class VarForm(FlaskForm):
                                default='Percentile')
     red_bin = StringField(u'Red Bin:', default='33')
     yellow_bin = StringField(u'Yellow Bin:', default='33')
+    all_variables = SelectField(u'Normalize:',
+                                choices=[('standardize', 'standardize'),
+                                         ('min-max scaler', 'min-max scaler'),
+                                         ('none', 'none'),
+                                         ('not applicable', 'not applicable')],
+                                default="not applicable")
 
 
 class DataVisForm(FlaskForm):
