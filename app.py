@@ -126,7 +126,7 @@ def index():
         # if form.all_variables != 'not applicable', then change all normalize values in variables accordingly
         if form.all_variables.data != 'not applicable':
             for i in range(len(data_copy.columns)):
-                form.variables[i].normalize.data = form.all_variables.data 
+                form.variables[var_idx_list[i]].normalize.data = form.all_variables.data 
 
         avf_data, counts_dict = convert_data_to_avf_columnwise(data_copy, form, var_idx_list)
 
