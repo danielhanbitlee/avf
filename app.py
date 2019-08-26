@@ -8,8 +8,7 @@ from wtforms import SelectField, FormField, FieldList
 
 from avf import calc_avf, count_freq_for_cat, map_freq_to_value, convert_data_to_avf, convert_data_to_avf_columnwise
 from data_wrangling import convert_num_to_obj, convert_col_to_cat, convert_num_to_obj_columnwise
-from color_cells import color_by_unique_vals, color_by_count_or_pct, color_data_fn, color_avf_data_fn
-from js_generator import dynamic_selector_script
+from color_cells import color_by_unique_vals, color_avf_col, color_data_fn, color_avf_data_fn
 from infoform import InfoForm, VarForm, DataVisForm
 from dataVis import dataVis
 
@@ -35,7 +34,7 @@ for i, col in enumerate(pd_data):
     if col in cat_col:
         color_data += color_data_fn(pd_data[col], i)
     else:
-        color_data += color_by_count_or_pct(pd_data[col], 'Continuous', i, 33, 33) 
+        color_data += color_avf_col(pd_data[col], 'Continuous', i, 33, 33) 
 
 num_vars = len(pd_data.columns)
 
