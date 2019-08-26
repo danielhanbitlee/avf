@@ -148,8 +148,78 @@ td.running {
 <input type="submit" value="Submit">
 </form>
 
-{{ script | safe }}
-{{ div | safe }}
+{{ dataVisScript | safe }}
+{{ dataVisDiv | safe }}
 
+<br>
+
+<h1 style='font-family:helvetical;'>Performance Evaluation</h1>
+
+<br>
+
+<table>
+    <tr>
+        <td align="center" style="font-weight:bold"> AVF Method </td>
+        <td align="left" style="font-weight:bold"> {{ form.color_method.data }}</td>
+    </tr>
+    <tr>
+        <td align="center" style="font-weight:bold"> Number of Observations </td>
+        <td align="left" style="font-weight:bold"> {{ n_obs }}</td>
+    </tr>
+    <tr>
+        <td align="center" style="font-weight:bold"> Number of Outliers <td>
+        <td align="left" style="font-weight:bold"> {{ n_outliers}} <td>
+    </tr>
+    <tr>
+        <td align="center" style="font-weight:bold"> Percent of Outliers <td>
+        <td align="left" style="font-weight:bold"> {{ pct_outliers }} <td>
+    </tr>
+</table>
+
+ <h2 style='font-family:helvetical;'>Confusion Matrix</h2>
+<table>
+    <tr>
+        <td align="center" style="font-weight:bold"> </td>
+        <td align="center" style="font-weight:bold"> Predicted Outliers </td>
+        <td align="center" style="font-weight:bold"> Predicted Non-Outliers </td>
+    </tr>
+    <tr>
+        <td align="center" style="font-weight:bold"> Actual Outliers <td>
+        <td align="center" style="font-weight:bold"> TP = {{ tp }} <td>
+        <td align="center" style="font-weight:bold"> FN = {{ fn }} <td>
+    </tr>
+    <tr>
+        <td align="center" style="font-weight:bold"> Actual Non-Outliers <td>
+        <td align="center" style="font-weight:bold"> FP = {{ fp }} <td>
+        <td align="center" style="font-weight:bold"> TN = {{ tn }} <td>
+    </tr>
+
+</table>
+
+<br>
+
+<table>
+    <tr>
+        <td align="center" style="font-weight:bold"> Metric </td>
+        <td align="left" style="font-weight:bold"> Value </td>
+    </tr>
+    <tr>
+        <td align="center" style="font-weight:bold"> Accuracy <td>
+        <td align="left" style="font-weight:bold"> {{ acc }} <td>
+    </tr>
+    <tr>
+        <td align="center" style="font-weight:bold"> Sensitivity <td>
+        <td align="left" style="font-weight:bold"> {{ sens }} <td>
+    </tr>
+    <tr>
+        <td align="center" style="font-weight:bold"> Specificity <td>
+        <td align="left" style="font-weight:bold"> {{ spec }} <td>
+    </tr>
+    <tr>
+        <td align="center" style="font-weight:bold"> Precision <td>
+        <td align="left" style="font-weight:bold"> {{ prcsn }} <td>
+    </tr>
+</table>
+ 
 </body>
 </html>
