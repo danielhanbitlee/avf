@@ -80,6 +80,7 @@ def index():
     # convert raw data to avf 
     avf_data, counts_dict = convert_data_to_avf(data_copy, True)    
 
+
     dataVisForm = DataVisForm()
 
     script, div = dataVis(dataVisForm, avf_data, counts_dict)
@@ -147,9 +148,10 @@ def index():
             form.red_bin.data = None
             form.yellow_bin.data = None 
 
+    avf_data = avf_data.merge(pd_data, left_index=True, right_index=True, suffixes=('', '_y'))
     return render_template('index.html',
                            data=pd_data.to_html(table_id="data"),
-                           avf_data=avf_data.to_html(table_id='avf_data'),
+                           avf_data=avf_data.to_html(table_id='avf_data', classes='avf_data_class'),
                            variables=pd_data.columns,
                            form=form, parameter_dict=parameter_dict,
                            color_avf_data=color_avf_data,
