@@ -8,10 +8,10 @@ from wtforms import SelectField, FormField, FieldList
 
 from avf import calc_avf, count_freq_for_cat, map_freq_to_value, convert_data_to_avf, convert_data_to_avf_columnwise
 from data_wrangling import convert_num_to_obj, convert_col_to_cat, convert_num_to_obj_columnwise
-from color_cells import color_by_unique_vals, color_by_count_or_pct, color_data_fn, color_avf_data_fn
-from js_generator import dynamic_selector_script
+from color_cells import color_by_unique_vals, color_avf_col, color_data_fn, color_avf_data_fn
 from infoform import InfoForm, VarForm, DataVisForm
 from dataVis import dataVis
+from performance import generate_confusion_matrix
 
 pd_data = pd.read_csv('data/predict_income_small_outliers.csv').iloc[:1000, ]
 pd_data.drop(columns=['id', 'fnlwgt'], inplace=True)
@@ -35,7 +35,7 @@ for i, col in enumerate(pd_data):
     if col in cat_col:
         color_data += color_data_fn(pd_data[col], i)
     else:
-        color_data += color_by_count_or_pct(pd_data[col], 'Continuous', i, 33, 33) 
+        color_data += color_avf_col(pd_data[col], 'Continuous', i, 33, 33) 
 
 num_vars = len(pd_data.columns)
 
@@ -83,7 +83,7 @@ def index():
 
     dataVisForm = DataVisForm()
 
-    script, div = dataVis(dataVisForm, avf_data, counts_dict)
+    dataVisScript, dataVisDiv = dataVis(dataVisForm, avf_data, counts_dict)
 
     color_avf_data, _ = color_avf_data_fn(avf_data)
 
@@ -133,7 +133,7 @@ def index():
 
         avf_data['avf'] = avf_data.apply(np.sum, axis=1) / len(avf_data.columns)
 
-        script, div = dataVis(dataVisForm, avf_data, counts_dict)
+        dataVisScript, dataVisDiv = dataVis(dataVisForm, avf_data, counts_dict)
 
         try:
             color_avf_data, parameter_dict = color_avf_data_fn(avf_data, form, parameter_dict)
@@ -149,15 +149,32 @@ def index():
             form.yellow_bin.data = None 
 
     avf_data = avf_data.merge(pd_data, left_index=True, right_index=True, suffixes=('', '_y'))
+
+    (tp, tn, fp, fn,
+     acc, sens, spec, prcsn,
+     n_obs, n_outliers, pct_outliers) = generate_confusion_matrix(pd_data, avf_data,
+                                                         'income', '>50K', 'avf',
+                                                         form.color_method.data,
+                                                         form.red_bin.data,
+                                                         form.yellow_bin.data)
+
     return render_template('index.html',
                            data=pd_data.to_html(table_id="data"),
-                           avf_data=avf_data.to_html(table_id='avf_data', classes='avf_data_class'),
+                           avf_data=avf_data.to_html(table_id='avf_data',
+                                                     classes='avf_data_class'),
                            variables=pd_data.columns,
-                           form=form, parameter_dict=parameter_dict,
+                           form=form,
+                           parameter_dict=parameter_dict,
                            color_avf_data=color_avf_data,
-                           color_data=color_data, 
-                           script=script, 
-                           div=div, avf_col_names=avf_data.columns, dataVisForm=dataVisForm)
+                           color_data=color_data,
+                           dataVisScript=dataVisScript,
+                           dataVisDiv=dataVisDiv,
+                           avf_col_names=avf_data.columns,
+                           dataVisForm=dataVisForm,
+                           tp=tp, tn=tn, fp=fp, fn=fn,
+                           acc=acc, sens=sens, spec=spec, prcsn=prcsn,
+                           n_obs=n_obs, n_outliers=n_outliers,
+                           pct_outliers=pct_outliers)
 
 
 if __name__ == '__main__':
