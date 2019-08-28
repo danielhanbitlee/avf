@@ -32,13 +32,13 @@ def generate_confusion_matrix(raw_data: pd.core.frame.DataFrame,
     tp = len(true_outliers_idx.intersection(pred_outliers_idx))
 
     # tn
-    tn = len(true_non_outliers_idx.intersection(pred_non_outliers_idx))
+    tn = len(true_non_outliers_idx.intersection(pred_non_outliers_idx.union(pred_potential_outliers_idx)))
 
     # fp
-    fp = len(pred_outliers_idx.difference(true_outliers_idx))
+    fp = len(pred_outliers_idx.intersection(true_non_outliers_idx))
 
     # fn
-    fn = len(pred_non_outliers_idx.difference(true_non_outliers_idx))
+    fn = len(pred_non_outliers_idx.union(pred_potential_outliers_idx).intersection(true_outliers_idx))
 
     try:
         # accuracy

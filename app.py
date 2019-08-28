@@ -12,6 +12,8 @@ from color_cells import color_by_unique_vals, color_avf_col, color_data_fn, colo
 from infoform import InfoForm, VarForm, DataVisForm
 from dataVis import dataVis
 from performance import generate_confusion_matrix
+from control_col_display import display_cols, hide_cols, show_hide_control_col
+
 
 pd_data = pd.read_csv('data/predict_income_small_outliers.csv').iloc[:1000, ]
 pd_data.drop(columns=['id', 'fnlwgt'], inplace=True)
@@ -148,7 +150,16 @@ def index():
             form.red_bin.data = None
             form.yellow_bin.data = None 
 
-    avf_data = avf_data.merge(pd_data, left_index=True, right_index=True, suffixes=('', '_y'))
+    # get js for displaying cols for avf table
+    displ_js = display_cols(avf_data.shape[1])
+
+    # get js for hiding cols for avf table
+    hide_js = hide_cols(pd_data.shape[1])
+
+    # get show_hide_control col for avf table
+    show_hide_control_js = show_hide_control_col(avf_data.columns.get_loc('avf'))
+
+    avf_data = avf_data.merge(pd_data, left_index=True, right_index=True, suffixes=('', ' '))
 
     (tp, tn, fp, fn,
      acc, sens, spec, prcsn,
@@ -174,7 +185,10 @@ def index():
                            tp=tp, tn=tn, fp=fp, fn=fn,
                            acc=acc, sens=sens, spec=spec, prcsn=prcsn,
                            n_obs=n_obs, n_outliers=n_outliers,
-                           pct_outliers=pct_outliers)
+                           pct_outliers=pct_outliers,
+                           displ_js=displ_js,
+                           hide_js=hide_js,
+                           show_hide_control_js=show_hide_control_js)
 
 
 if __name__ == '__main__':

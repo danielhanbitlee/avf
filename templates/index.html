@@ -43,44 +43,19 @@
                                     header: function ( row ) {
                                         var data = row.data();
 					console.log(data)
-                                        return 'Details for '+data[0]+' '+data[1];
+                                        return 'Details for Row ' + data[0];
                                     }
                                 } ),
-                                // renderer: $.fn.dataTable.Responsive.renderer.tableAll( {
-                                //    tableClass: 'avf_data_class'
-                                // } )
-                            }
+                            {{ show_hide_control_js }}
+                           }
                 },
 		columnDefs: [
-			{
-				targets: [-2],
-				visible: false,
-			},
-                       {
-				targets: [-1],
-				className: "all",
-			},
-                        {
-				targets: [-3],
-				className: "all",
-			},
-                        {
-				targets: [-4],
-				className: "all",
-			},
-
+                        {{ displ_js }}
+                        {{ hide_js }}
 		],
           });
         });
     </script>
-    <style>
-    td.failed {
-  background-color: red;
-}
-td.running {
-  background-color: green;
-}
-    </style>
 </head>
 <h1 style='font-family:helvetical;'>Raw Data Table</h1>
 <body>
