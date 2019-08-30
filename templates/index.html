@@ -56,8 +56,30 @@
         });
     </script>
 <style>
-tbody tr:nth-child(odd) {
-  background: #eee;
+body {
+	margin: 32px;
+}
+
+.avfc th, .avfc td {
+	padding: 2px 6px;
+}
+
+.avfc select {
+	padding: 0 4px;
+}
+
+.striped td, .striped th {
+	padding: 10px 16px;
+	min-width: 172px;
+}
+
+.striped tbody tr:nth-child(odd) {
+	text-align: center !important;
+	background-color: #fffeef;
+}
+.striped th {
+	text-align: center !important;
+	background-color: #fffcd2;
 }
 </style>
 </head>
@@ -83,7 +105,7 @@ tbody tr:nth-child(odd) {
 
 <form method="POST", action="">
     {{ form.hidden_tag() }}
-    <table>
+    <table class="avfc">
     <tr>
         <td align="center" style="font-weight:bold"> Variable Name </td>
         <td align="center" style="font-weight:bold"> Variable Type </td>
@@ -153,10 +175,10 @@ tbody tr:nth-child(odd) {
 
 <br>
 
-<table border="1"> 
+<table class="striped" border="1"> 
     <tr>
-        <td align="center" style="font-weight:bold"> AVF Method </td>
-        <td align="center" style="font-weight:bold"> {{ form.color_method.data }}</td>
+        <th align="center" style="font-weight:bold"> AVF Method </td>
+        <th align="center" style="font-weight:bold"> {{ form.color_method.data }}</td>
     </tr>
     <tr>
         <td align="center" style="font-weight:bold"> Number of Observations </td>
@@ -173,11 +195,11 @@ tbody tr:nth-child(odd) {
 </table>
 
  <h2 style='font-family:helvetical;'>Confusion Matrix</h2>
-<table border="1">
+<table class="striped" border="1">
     <tr>
-        <td align="center" style="font-weight:bold"> </td>
-        <td align="center" style="font-weight:bold"> Predicted Outliers </td>
-        <td align="center" style="font-weight:bold"> Predicted Non-Outliers </td>
+        <th align="center" style="font-weight:bold"> </td>
+        <th align="center" style="font-weight:bold"> Predicted Outliers </td>
+        <th align="center" style="font-weight:bold"> Predicted Non-Outliers </td>
     </tr>
     <tr>
         <td align="center" style="font-weight:bold"> Actual Outliers </td>
@@ -194,10 +216,10 @@ tbody tr:nth-child(odd) {
 
 <br>
 
-<table border="1">
+<table class="striped" border="1">
     <tr>
-        <td align="center" style="font-weight:bold"> Metric </td>
-        <td align="center" style="font-weight:bold"> Value </td>
+        <th align="center" style="font-weight:bold"> Metric </td>
+        <th align="center" style="font-weight:bold"> Value </td>
     </tr>
     <tr>
         <td align="center" style="font-weight:bold"> Accuracy </td>
